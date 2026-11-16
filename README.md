@@ -53,4 +53,6 @@ Einzige Verbindung nach außen: beim Benennen eines neuen Barcodes wird die Barc
 
 ## Ersteller und Lizenzen
 
-Kinderkasse © 2026 Marcel. Lizenzhinweise der verwendeten Bibliothek und Daten stehen in der App unter Einstellungen → Info.
+Kinderkasse © 2026 Marcel. Wenn dir die Kasse gefällt: [☕ Buy me a coffee](https://buymeacoffee.com/marwaeck)
+
+Lizenzhinweise der verwendeten Bibliothek und Daten stehen in der App unter Einstellungen → Info.

@@ -1227,8 +1227,8 @@ $('#wipeBtn').onclick=()=>{ if(!store.items.length) return; if(Date.now()-wipeAr
 $('#setClose').onclick=()=>{ const n=$('#setShop').value.trim(); if(n && n!==curShop().name) store.shopNames[store.shopId]=n; else delete store.shopNames[store.shopId]; $('#shopName').textContent=shopTitle(); save(); hide('#setModal'); paused=false; setStatus(readyText()); };
 
 /* ---------- Info ---------- */
-const APP_VERSION='1.6';
-const BMC_USER='';   // Buy-Me-a-Coffee-Name eintragen, z. B. 'marwaeck' – dann erscheint der Button
+const APP_VERSION='1.6.1';
+const BMC_USER='marwaeck';   // Buy-Me-a-Coffee-Name eintragen, z. B. 'marwaeck' – dann erscheint der Button
 $('#appVer').textContent=APP_VERSION;
 if(BMC_USER){ $('#bmcBtn').href='https://buymeacoffee.com/'+encodeURIComponent(BMC_USER); $('#bmcBtn').style.display='inline-flex'; }
 
