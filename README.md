@@ -43,6 +43,7 @@ Die Kamera funktioniert nur über `https://` (nicht als lokale Datei).
 | `manifest.webmanifest` | App-Infos für „Zum Home-Bildschirm“ |
 | `apple-touch-icon.png` | App-Icon |
 | `docs/social-preview.png` | Vorschaubild für GitHub |
+| `fonts/cookie.woff2` | Schrift „Cookie“ für den Coffee-Button (SIL OFL 1.1, siehe `fonts/COOKIE-OFL.txt`) |
 
 Kein Build-Schritt nötig – der Ordner kann direkt auf einen statischen Webserver (z. B. GitHub Pages) hochgeladen werden.
 

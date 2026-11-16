@@ -239,8 +239,12 @@
   .infoBox .il{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
   .infoBox .il span:first-child{color:var(--muted);font-weight:700}
   .infoBox .lic{margin-top:8px;padding-top:8px;border-top:1px solid #3a4560;font-size:13px;color:var(--muted)}
-  .bmc{display:inline-flex;align-items:center;gap:10px;margin-top:12px;background:#ffdd00;color:#000;font-weight:800;font-size:18px;padding:12px 18px;border-radius:12px;text-decoration:none;box-shadow:0 4px 0 rgba(0,0,0,.35)}
-  .bmc:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+  @font-face{font-family:'Cookie';src:url('fonts/cookie.woff2') format('woff2');font-display:swap}
+  .infoBox a.bmc,.bmc{color:#000;display:inline-flex;align-items:center;gap:8px;margin-top:14px;background:#FFDD00;color:#000;border:1px solid #000;border-radius:12px;
+    padding:6px 22px 8px 16px;height:56px;font-family:'Cookie',cursive;font-size:30px;line-height:1;text-decoration:none;letter-spacing:.3px;
+    box-shadow:0 2px 4px rgba(0,0,0,.25);transition:box-shadow .2s,transform .1s}
+  .bmc:active{transform:translateY(2px);box-shadow:none}
+  .bmc .cup{font-family:-apple-system,"Apple Color Emoji","Noto Color Emoji",sans-serif;font-size:26px}
   .setRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #3a4560}
   .setRow span{font-weight:700;font-size:17px}
   .seg{display:flex;background:#1b2130;border-radius:12px;padding:3px}
@@ -419,9 +423,10 @@
         Kinderkasse © 2026 Marcel.<br>
         Barcode-Erkennung: <a href="https://github.com/undecaf/zbar-wasm" target="_blank" rel="noopener">zbar-wasm</a> 0.11.0 von F. Kasper, auf Basis der <a href="https://github.com/mchehab/zbar" target="_blank" rel="noopener">ZBar</a>-Bibliothek – <a href="ZBAR-LICENSE.txt" target="_blank" rel="noopener">GNU LGPL 2.1 oder neuer</a>.<br>
         Produktnamen-Vorschläge: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>, Daten unter Open Database License (ODbL).<br>
+        Schrift „Cookie“ von Ania Kruk – <a href="fonts/COOKIE-OFL.txt" target="_blank" rel="noopener">SIL Open Font License 1.1</a>.<br>
         Spielgeld ist eine eigene vereinfachte Gestaltung, kein echtes Zahlungsmittel. Emojis werden vom Betriebssystem dargestellt.
       </div>
-      <a class="bmc" id="bmcBtn" target="_blank" rel="noopener" style="display:none">☕ Buy me a coffee</a>
+      <a class="bmc" id="bmcBtn" target="_blank" rel="noopener" style="display:none"><span class="cup">☕</span>Buy me a coffee</a>
     </div>
     <div class="sheetBtns">
       <button class="btn red" id="wipeBtn">Alle Artikel löschen</button>
@@ -1227,7 +1232,7 @@ $('#wipeBtn').onclick=()=>{ if(!store.items.length) return; if(Date.now()-wipeAr
 $('#setClose').onclick=()=>{ const n=$('#setShop').value.trim(); if(n && n!==curShop().name) store.shopNames[store.shopId]=n; else delete store.shopNames[store.shopId]; $('#shopName').textContent=shopTitle(); save(); hide('#setModal'); paused=false; setStatus(readyText()); };
 
 /* ---------- Info ---------- */
-const APP_VERSION='1.6.1';
+const APP_VERSION='1.6.2';
 const BMC_USER='marwaeck';   // Buy-Me-a-Coffee-Name eintragen, z. B. 'marwaeck' – dann erscheint der Button
 $('#appVer').textContent=APP_VERSION;
 if(BMC_USER){ $('#bmcBtn').href='https://buymeacoffee.com/'+encodeURIComponent(BMC_USER); $('#bmcBtn').style.display='inline-flex'; }
