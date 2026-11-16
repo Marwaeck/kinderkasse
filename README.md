@@ -43,7 +43,6 @@ Die Kamera funktioniert nur über `https://` (nicht als lokale Datei).
 | `manifest.webmanifest` | App-Infos für „Zum Home-Bildschirm“ |
 | `apple-touch-icon.png` | App-Icon |
 | `docs/social-preview.png` | Vorschaubild für GitHub |
-| `fonts/cookie.woff2` | Schrift „Cookie“ für den Coffee-Button (SIL OFL 1.1, siehe `fonts/COOKIE-OFL.txt`) |
 
 Kein Build-Schritt nötig – der Ordner kann direkt auf einen statischen Webserver (z. B. GitHub Pages) hochgeladen werden.
 
@@ -54,6 +53,6 @@ Einzige Verbindung nach außen: beim Benennen eines neuen Barcodes wird die Barc
 
 ## Ersteller und Lizenzen
 
-Kinderkasse © 2026 Marcel. Wenn dir die Kasse gefällt: [☕ Buy me a coffee](https://buymeacoffee.com/marwaeck)
+Kinderkasse © 2026 Marcel.
 
 Lizenzhinweise der verwendeten Bibliothek und Daten stehen in der App unter Einstellungen → Info.
