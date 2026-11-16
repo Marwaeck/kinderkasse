@@ -1,9 +1,11 @@
 # 🛒 Kinderkasse
 
+![Kinderkasse](docs/social-preview.png)
+
 Eine Spielkasse für Kinder als Web-App, gemacht für das **iPad Pro 11"** (läuft aber in jedem modernen Browser).
 Gegenstände oder Verpackungen über die Kamera halten – die Kasse piept, zeigt Artikel und Preis an und sagt den Preis an.
 
-**Live:** https://kinderkasse.pages.dev
+**Live:** https://marwaeck.github.io/kinderkasse/
 
 ## Funktionen
 
@@ -25,7 +27,7 @@ Gegenstände oder Verpackungen über die Kamera halten – die Kasse piept, zeig
 
 ## Aufs iPad bringen
 
-1. https://kinderkasse.pages.dev in Safari öffnen
+1. https://marwaeck.github.io/kinderkasse/ in Safari öffnen
 2. Teilen → „Zum Home-Bildschirm“
 3. App starten, „Kasse öffnen“, Kamera erlauben
 
@@ -40,10 +42,15 @@ Die Kamera funktioniert nur über `https://` (nicht als lokale Datei).
 | `sw.js` | Service Worker für den Offline-Betrieb |
 | `manifest.webmanifest` | App-Infos für „Zum Home-Bildschirm“ |
 | `apple-touch-icon.png` | App-Icon |
+| `docs/social-preview.png` | Vorschaubild für GitHub |
 
-Kein Build-Schritt nötig – der Ordner kann direkt auf einen statischen Webserver (z. B. Cloudflare Pages) hochgeladen werden.
+Kein Build-Schritt nötig – der Ordner kann direkt auf einen statischen Webserver (z. B. GitHub Pages) hochgeladen werden.
 
 ## Daten
 
 Gelernte Artikel, Einstellungen und Tagesstatistik liegen nur im Browser des Geräts (`localStorage`).
 Einzige Verbindung nach außen: beim Benennen eines neuen Barcodes wird die Barcode-Nummer an openfoodfacts.org geschickt (abschaltbar).
+
+## Ersteller und Lizenzen
+
+Kinderkasse © 2026 Marcel. Lizenzhinweise der verwendeten Bibliothek und Daten stehen in der App unter Einstellungen → Info.

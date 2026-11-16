@@ -234,6 +234,13 @@
   .bankcard .tap{position:absolute;right:16px;bottom:14px;font-size:13px;font-weight:800;background:rgba(0,0,0,.25);padding:6px 10px;border-radius:10px}
   .bankcard.used{transform:translate(-250px,-40px) rotate(-8deg) scale(.7);opacity:0;pointer-events:none;transition:transform .7s cubic-bezier(.3,1.2,.4,1),opacity .4s .9s}
   .termHint{width:100%;text-align:center;color:#fff;font-weight:700;font-size:18px;margin-top:6px}
+  .infoBox{background:#1b2130;border-radius:14px;padding:14px 16px;font-size:15px;line-height:1.55}
+  .infoBox a{color:var(--blue);-webkit-user-select:text;user-select:text}
+  .infoBox .il{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
+  .infoBox .il span:first-child{color:var(--muted);font-weight:700}
+  .infoBox .lic{margin-top:8px;padding-top:8px;border-top:1px solid #3a4560;font-size:13px;color:var(--muted)}
+  .bmc{display:inline-flex;align-items:center;gap:10px;margin-top:12px;background:#ffdd00;color:#000;font-weight:800;font-size:18px;padding:12px 18px;border-radius:12px;text-decoration:none;box-shadow:0 4px 0 rgba(0,0,0,.35)}
+  .bmc:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
   .setRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #3a4560}
   .setRow span{font-weight:700;font-size:17px}
   .seg{display:flex;background:#1b2130;border-radius:12px;padding:3px}
@@ -402,6 +409,20 @@
     <h3>Gelernte Artikel</h3>
     <div id="itemList"></div>
     <p class="hint">Barcodes: Verpackung mit dem Strichcode ruhig vor die Kamera halten. Beim ersten Mal fragt die Kasse nach Name und Preis, danach piept sie sofort. Tipp: Jeden Artikel ohne Barcode 2–4 mal lernen (verschiedene Seiten, „… schon bekannt“ antippen). Die Erkennung arbeitet mit Farben – unterschiedlich farbige Sachen klappen am besten. Vor dem Lernen kurz „Kamera neu“ drücken, während nichts vor der Kamera ist.</p>
+    <h3>Info</h3>
+    <div class="infoBox">
+      <div class="il"><span>App</span><span>Kinderkasse · Version <span id="appVer"></span></span></div>
+      <div class="il"><span>Erstellt von</span><span>Marcel</span></div>
+      <div class="il"><span>Quellcode</span><a href="https://github.com/Marwaeck/kinderkasse" target="_blank" rel="noopener">github.com/Marwaeck/kinderkasse</a></div>
+      <div class="lic">
+        <b>Lizenzen</b><br>
+        Kinderkasse © 2026 Marcel.<br>
+        Barcode-Erkennung: <a href="https://github.com/undecaf/zbar-wasm" target="_blank" rel="noopener">zbar-wasm</a> 0.11.0 von F. Kasper, auf Basis der <a href="https://github.com/mchehab/zbar" target="_blank" rel="noopener">ZBar</a>-Bibliothek – <a href="ZBAR-LICENSE.txt" target="_blank" rel="noopener">GNU LGPL 2.1 oder neuer</a>.<br>
+        Produktnamen-Vorschläge: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>, Daten unter Open Database License (ODbL).<br>
+        Spielgeld ist eine eigene vereinfachte Gestaltung, kein echtes Zahlungsmittel. Emojis werden vom Betriebssystem dargestellt.
+      </div>
+      <a class="bmc" id="bmcBtn" target="_blank" rel="noopener" style="display:none">☕ Buy me a coffee</a>
+    </div>
     <div class="sheetBtns">
       <button class="btn red" id="wipeBtn">Alle Artikel löschen</button>
       <button class="btn yellow" id="setClose">Fertig</button>
@@ -1204,6 +1225,12 @@ $('#itemList').addEventListener('click',e=>{
 let wipeArm=0;
 $('#wipeBtn').onclick=()=>{ if(!store.items.length) return; if(Date.now()-wipeArm>3000){ wipeArm=Date.now(); toast('Wirklich alle löschen? Nochmal tippen.'); return; } store.items=[]; save(); paintItemList(); renderQuick(); toast('Alle Artikel gelöscht'); };
 $('#setClose').onclick=()=>{ const n=$('#setShop').value.trim(); if(n && n!==curShop().name) store.shopNames[store.shopId]=n; else delete store.shopNames[store.shopId]; $('#shopName').textContent=shopTitle(); save(); hide('#setModal'); paused=false; setStatus(readyText()); };
+
+/* ---------- Info ---------- */
+const APP_VERSION='1.6';
+const BMC_USER='';   // Buy-Me-a-Coffee-Name eintragen, z. B. 'marwaeck' – dann erscheint der Button
+$('#appVer').textContent=APP_VERSION;
+if(BMC_USER){ $('#bmcBtn').href='https://buymeacoffee.com/'+encodeURIComponent(BMC_USER); $('#bmcBtn').style.display='inline-flex'; }
 
 /* ---------- Sicherung ---------- */
 function backupInfo(){ const off = ('serviceWorker' in navigator) && navigator.serviceWorker.controller;
