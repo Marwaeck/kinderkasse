@@ -277,6 +277,14 @@
   .thanks{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;z-index:29;font-size:64px;font-weight:900;text-shadow:0 4px 20px rgba(0,0,0,.6);pointer-events:none}
   .thanks.show{display:flex;animation:pop .5s}
   .thanks small{font-size:26px;font-weight:700;margin-top:8px}
+  /* Querformat: Kamera kleiner, Knöpfe daneben */
+  @media (orientation:landscape){
+    .right{display:grid;grid-template-columns:1fr 150px;grid-template-rows:auto 1fr;gap:12px}
+    .cam{width:100%}
+    .camTools{flex-direction:column}
+    .camTools .btn{flex:1;font-size:16px;padding:8px 6px}
+    .quick{grid-column:1 / 3}
+  }
 </style>
 </head>
 <body>
@@ -1299,7 +1307,7 @@ $('#wipeBtn').onclick=()=>{ if(!store.items.length) return; if(Date.now()-wipeAr
 $('#setClose').onclick=()=>{ const n=$('#setShop').value.trim(); if(n && n!==curShop().name) store.shopNames[store.shopId]=n; else delete store.shopNames[store.shopId]; $('#shopName').textContent=shopTitle(); save(); hide('#setModal'); paused=false; setStatus(readyText()); };
 
 /* ---------- Info ---------- */
-const APP_VERSION='1.7.0';
+const APP_VERSION='1.7.1';
 
 /* ---------- Sicherung ---------- */
 function backupInfo(){ const off = ('serviceWorker' in navigator) && navigator.serviceWorker.controller;
