@@ -166,10 +166,24 @@
   .tile .badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:12px;font-weight:900;padding:3px 6px;border-radius:9px;transform:rotate(8deg);box-shadow:0 2px 0 rgba(0,0,0,.3)}
   .tile s{color:var(--muted);font-weight:400;font-size:11px;margin-right:3px}
   #lines .off{background:#ff5d5d;color:#fff;font-size:12px;font-weight:800;padding:1px 6px;border-radius:7px;margin-left:6px}
-  .shopGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-  .shopTile{border-radius:20px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:800;font-size:22px;color:#fff;border:5px solid transparent;box-shadow:0 5px 0 rgba(0,0,0,.35)}
-  .shopTile .se{font-size:56px;line-height:1}
-  .shopTile.on{border-color:#fff}
+  .shopGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+  .shopTile{position:relative;border-radius:20px;padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;font-weight:800;font-size:19px;color:#fff;border:5px solid transparent;box-shadow:0 5px 0 rgba(0,0,0,.35);transition:transform .1s}
+  .shopTile:active{transform:scale(.96)}
+  .shopTile .se{font-size:50px;line-height:1}
+  .shopTile .sp{font-size:18px;letter-spacing:2px;opacity:.85;font-weight:400}
+  .shopTile.on{border-color:var(--yellow)}
+  .shopTile.on::after{content:'✓';position:absolute;top:-10px;right:-10px;width:34px;height:34px;border-radius:50%;background:var(--yellow);color:#2a2000;font-size:20px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+  /* Einkaufsliste (Kunden-Modus) */
+  .orderBar{display:none;align-items:center;gap:8px;background:#fff4b8;color:#3a2f00;border-radius:14px;padding:8px 10px;box-shadow:0 4px 0 rgba(0,0,0,.3);transform:rotate(-.6deg)}
+  .orderBar.show{display:flex}
+  .orderBar.done{background:#c9ffd9;color:#03250f}
+  .orderBar .oh{font-size:30px;line-height:1;background:none;padding:0 2px}
+  .orderItems{flex:1;display:flex;flex-wrap:wrap;gap:6px}
+  .oi{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.7);border:2px solid #d8c56a;border-radius:10px;padding:3px 8px;font-weight:800;font-size:17px}
+  .oi .e{font-size:24px;line-height:1}
+  .oi.ok{background:#62ff95;border-color:#1f9e4b;color:#03250f}
+  .oi.over{background:#ffb3b3;border-color:#d04545;color:#4a0000}
+  .orderBar .ox{background:rgba(0,0,0,.12);color:inherit;border-radius:50%;width:34px;height:34px;font-size:20px;font-weight:900;flex:0 0 auto}
   .discRow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:12px}
   .stamps{display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px;color:var(--muted)}
   .stamps i{width:30px;height:30px;border-radius:50%;border:2px dashed #6b7a99;display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:16px}
@@ -283,6 +297,11 @@
         <div class="lcdTop"><span id="lcdItem">WILLKOMMEN!</span><span id="lcdPrice"></span></div>
         <div class="lcdTotal"><span>SUMME</span><span id="lcdSum">0,00 €</span></div>
       </div>
+      <div class="orderBar" id="orderBar">
+        <button class="oh" id="orderSay" aria-label="Einkaufsliste vorlesen">📝</button>
+        <div class="orderItems" id="orderItems"></div>
+        <button class="ox" id="orderX" aria-label="Einkaufsliste weglegen">×</button>
+      </div>
       <div class="receipt">
         <div class="receiptHead">★ KASSENBON ★</div>
         <ul id="lines"></ul>
@@ -306,6 +325,7 @@
         <button id="snapBtn" class="btn yellow">📸 Scannen</button>
         <button id="bgBtn" class="btn grey">🔄 Kamera neu</button>
         <button id="scaleBtn" class="btn blue">⚖️ Waage</button>
+        <button id="orderBtn" class="btn orange">📝 Kunde</button>
       </div>
       <div class="quick">
         <div class="quickHead" id="quickHead">Schnelltasten</div>
@@ -393,6 +413,7 @@
     <div class="setRow"><span>Rabattmarken und Gutscheine</span><div class="seg" id="segCoupons"></div></div>
     <div class="setRow"><span>Barcodes scannen</span><div class="seg" id="segBarcode"></div></div>
     <div class="setRow"><span>Produktname zum Barcode online suchen</span><div class="seg" id="segLookup"></div></div>
+    <div class="setRow"><span>Einkaufsliste (📝 Kunde)</span><div class="seg" id="segLevel"></div></div>
     <div class="setRow"><span>Rückgeld selbst herausgeben</span><div class="seg" id="segChange"></div></div>
     <div class="setRow"><span>Preis ansagen</span><div class="seg" id="segSpeak"></div></div>
     <div class="setRow"><span>Kamera-Seite (Querformat)</span><div class="seg" id="segSide"></div></div>
@@ -553,7 +574,7 @@ const CATALOG = [
 ];
 
 /* ---------- Speicher ---------- */
-const store = {shop:'Kinderkasse', items:[], settings:{facing:'user', sens:1, strict:1, random:true, speak:true, debug:false, camSide:'left', change:true, barcode:true, lookup:true, offers:true, coupons:true}, shopId:'supermarkt', shopNames:{}, stamps:0, offerSalt:0, days:{}};
+const store = {shop:'Kinderkasse', items:[], settings:{facing:'user', sens:1, strict:1, random:true, speak:true, debug:false, camSide:'left', change:true, level:1, barcode:true, lookup:true, offers:true, coupons:true}, shopId:'supermarkt', shopNames:{}, stamps:0, offerSalt:0, days:{}};
 try { const s = JSON.parse(localStorage.getItem(KEY) || 'null');
   if (s) { store.items = Array.isArray(s.items) ? s.items : []; Object.assign(store.settings, s.settings || {});
     if(s.shopId) store.shopId=s.shopId; store.shopNames=s.shopNames||{}; store.stamps=s.stamps|0; store.offerSalt=s.offerSalt|0; store.days=s.days||{};
@@ -625,14 +646,26 @@ const SHOPS={
     {name:'Kugel Eis',emoji:'🍦',price:150},{name:'Eisbecher',emoji:'🍨',price:490},{name:'Wassereis',emoji:'🍧',price:100},{name:'Erdbeerbecher',emoji:'🍓',price:550},
     {name:'Bananensplit',emoji:'🍌',price:590},{name:'Zitroneneis',emoji:'🍋',price:150},{name:'Schokoeis',emoji:'🍫',price:150},{name:'Waffel',emoji:'🧇',price:350},
     {name:'Milchshake',emoji:'🥤',price:390},{name:'Eiskaffee',emoji:'🧊',price:420},{name:'Sahne',emoji:'🥛',price:50},{name:'Kirschen',emoji:'🍒',price:70},
-    {name:'Streusel',emoji:'✨',price:30},{name:'Lolli',emoji:'🍭',price:80},{name:'Espresso',emoji:'☕',price:180}]}
+    {name:'Streusel',emoji:'✨',price:30},{name:'Lolli',emoji:'🍭',price:80},{name:'Espresso',emoji:'☕',price:180}]},
+  schreibwaren:{name:'Schreibwarenladen',emoji:'✏️',c:['#14261f','#1d382d','#28493b','#7dffb2'],cat:[
+    {name:'Bleistift',emoji:'✏️',price:49},{name:'Kugelschreiber',emoji:'🖊️',price:129},{name:'Füller',emoji:'🖋️',price:899},{name:'Buntstifte',emoji:'🖍️',price:349},
+    {name:'Pinsel',emoji:'🖌️',price:199},{name:'Heft',emoji:'📒',price:99},{name:'Notizblock',emoji:'🗒️',price:149},{name:'Malblock',emoji:'📓',price:249},
+    {name:'Lineal',emoji:'📏',price:119},{name:'Schere',emoji:'✂️',price:299},{name:'Kleber',emoji:'🧴',price:179},{name:'Büroklammern',emoji:'📎',price:89},
+    {name:'Ordner',emoji:'📁',price:259},{name:'Briefumschlag',emoji:'✉️',price:25},{name:'Sticker',emoji:'⭐',price:150},{name:'Kalender',emoji:'📅',price:699},
+    {name:'Geschenkpapier',emoji:'🎁',price:199},{name:'Schulranzen',emoji:'🎒',price:4999}]},
+  tierhandlung:{name:'Tierhandlung',emoji:'🐾',c:['#132430','#1c3444','#264558','#ff9f43'],cat:[
+    {name:'Hundefutter',emoji:'🐕',price:349},{name:'Katzenfutter',emoji:'🥫',price:89},{name:'Leckerli',emoji:'🍖',price:199},{name:'Kauknochen',emoji:'🦴',price:249},
+    {name:'Vogelfutter',emoji:'🌻',price:229},{name:'Fischfutter',emoji:'🦐',price:399},{name:'Heu',emoji:'🌾',price:299},{name:'Katzenstreu',emoji:'🪣',price:599},
+    {name:'Futternapf',emoji:'🥣',price:499},{name:'Hundeleine',emoji:'🦮',price:1299},{name:'Tennisball',emoji:'🎾',price:149},{name:'Wollknäuel',emoji:'🧶',price:199},
+    {name:'Spielmaus',emoji:'🐭',price:249},{name:'Goldfisch',emoji:'🐠',price:350},{name:'Hamster',emoji:'🐹',price:1299},{name:'Wellensittich',emoji:'🦜',price:2499},
+    {name:'Kaninchen',emoji:'🐰',price:2999},{name:'Schildkröte',emoji:'🐢',price:3999}]}
 };
 if(!SHOPS[store.shopId]) store.shopId='supermarkt';
 const curShop=()=>SHOPS[store.shopId];
 const shopTitle=id=>store.shopNames[id||store.shopId]||SHOPS[id||store.shopId].name;
 const today=()=>{ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 /* Sonderangebote: pro Tag und Laden drei Artikel */
-let offers={};
+let offers={}, order=null;
 function rollOffers(){
   offers={}; if(!store.settings.offers) return;
   let h=2166136261; for(const ch of today()+store.shopId+store.offerSalt) h=Math.imul(h^ch.charCodeAt(0),16777619);
@@ -647,9 +680,11 @@ function applyShop(){
   $('#shopEmoji').textContent=curShop().emoji; $('#shopName').textContent=shopTitle();
   rollOffers(); renderQuick();
 }
-function paintShops(){ $('#shopGrid').innerHTML=Object.keys(SHOPS).map(id=>`<button class="shopTile${id===store.shopId?' on':''}" data-id="${id}" style="background:${SHOPS[id].c[2]}"><span class="se">${SHOPS[id].emoji}</span>${esc(shopTitle(id))}</button>`).join(''); }
+function paintShops(){ $('#shopGrid').innerHTML=Object.keys(SHOPS).map(id=>`<button class="shopTile${id===store.shopId?' on':''}" data-id="${id}" style="background:${SHOPS[id].c[2]}"><span class="se">${SHOPS[id].emoji}</span>${esc(shopTitle(id))}<span class="sp">${SHOPS[id].cat.slice(0,4).map(x=>x.emoji).join('')}</span></button>`).join(''); }
 $('#brandBtn').onclick=()=>{ paused=true; paintShops(); show('#shopModal'); };
-$('#shopGrid').addEventListener('click',e=>{ const b=e.target.closest('.shopTile'); if(!b) return; store.shopId=b.dataset.id; save(); applyShop(); paintShops(); tone(1200,0,.08,'triangle',.15); say(shopTitle()); });
+$('#shopGrid').addEventListener('click',e=>{ const b=e.target.closest('.shopTile'); if(!b) return; const changed=store.shopId!==b.dataset.id; store.shopId=b.dataset.id; save(); applyShop(); paintShops(); tone(1200,0,.08,'triangle',.15); say(shopTitle());
+  if(changed && order){ order=null; paintOrder(); }
+  setTimeout(()=>{ if($('#shopModal').classList.contains('show')){ hide('#shopModal'); paused=false; } },450); });
 $('#offersBtn').onclick=()=>{ store.offerSalt++; save(); rollOffers(); renderQuick(); toast(store.settings.offers ? '🏷 Neue Angebote: '+Object.keys(offers).map(k=>k.slice(2)+' −'+offers[k]+' %').join(', ') : 'Sonderangebote sind in den Einstellungen ausgeschaltet',3500); };
 $('#shopClose').onclick=()=>{ hide('#shopModal'); paused=false; };
 
@@ -700,7 +735,39 @@ function render(){
   $('#lcdSum').textContent = fmt(total());
   const hl=$('#lines li.hl'); if(hl) hl.scrollIntoView({block:'nearest',behavior:'smooth'});
   $('#payBtn').disabled = !cart.length;
+  paintOrder();
 }
+
+/* Kunden-Modus: Einkaufsliste */
+const LEVELS=[{n:2,q:1},{n:3,q:2},{n:4,q:3}];
+const haveQty=key=>{ const l=cart.find(x=>x.key===key); return l?l.qty:0; };
+const TIMES=['','einmal','zweimal','dreimal'];
+function makeOrder(){
+  const lv=LEVELS[store.settings.level]||LEVELS[1], cat=curShop().cat, idx=cat.map((_,i)=>i), items=[];
+  for(let k=0;k<lv.n && idx.length;k++){ const it=cat[idx.splice(Math.floor(Math.random()*idx.length),1)[0]];
+    items.push({key:'c:'+it.name,name:it.name,emoji:it.emoji,need:1+Math.floor(Math.random()*lv.q)}); }
+  order={shop:store.shopId,items,done:false};
+}
+function orderState(){
+  if(!order) return null;
+  const missing=order.items.filter(o=>haveQty(o.key)<o.need), over=order.items.filter(o=>haveQty(o.key)>o.need);
+  const extra=cart.filter(l=>!order.items.some(o=>o.key===l.key));
+  return {missing,over,extra,perfect:!missing.length&&!over.length&&!extra.length};
+}
+function sayOrder(){ if(!order) return; const p=order.items.map(o=>TIMES[o.need]+' '+o.name);
+  say('Ich hätte gerne: '+(p.length>1? p.slice(0,-1).join(', ')+' und '+p[p.length-1] : p[0])+'.'); }
+function paintOrder(){
+  const bar=$('#orderBar'); if(!bar) return;
+  bar.classList.toggle('show',!!order); if(!order) return;
+  $('#orderItems').innerHTML=order.items.map(o=>{ const h=haveQty(o.key); return `<span class="oi${h===o.need?' ok':h>o.need?' over':''}"><span class="e">${esc(o.emoji)}</span>${h}/${o.need}</span>`; }).join('')
+    +cart.filter(l=>!order.items.some(o=>o.key===l.key)).map(l=>`<span class="oi over"><span class="e">${esc(l.emoji)}</span>✗</span>`).join('');
+  const st=orderState(); bar.classList.toggle('done',st.perfect);
+  if(st.perfect && !order.done){ order.done=true; setTimeout(()=>{ tone(1320,0,.1,'triangle',.18); tone(1760,.12,.18,'triangle',.18); say('Alles da! Jetzt bitte bezahlen.'); },900); }
+  if(!st.perfect) order.done=false;
+}
+$('#orderBtn').onclick=()=>{ if(closing) return; makeOrder(); paintOrder(); learnTone(); sayOrder(); };
+$('#orderSay').onclick=sayOrder;
+$('#orderX').onclick=()=>{ order=null; paintOrder(); };
 function removeOne(key){
   const i=cart.findIndex(l=>l.key===key); if(i<0) return;
   if(--cart[i].qty<=0) cart.splice(i,1);
@@ -1059,9 +1126,16 @@ function finishSale(){
   let stampMsg='';
   if(store.settings.coupons){ if(payDisc.heft) store.stamps=0; store.stamps=Math.min(HEFT,store.stamps+1); save();
     stampMsg='<br>🎟 Rabattmarke bekommen ('+store.stamps+'/'+HEFT+')'+(store.stamps>=HEFT?' – Heft voll!':''); }
-  $('#thanks small').innerHTML='Auf Wiedersehen!'+stampMsg;
+  let orderMsg='', orderSpeech='';
+  const ost=orderState();
+  if(ost){ if(ost.perfect){ orderMsg='<br>⭐ Einkaufsliste perfekt erledigt!'; orderSpeech='Super, alles richtig eingekauft! '; }
+    else { const parts=[]; if(ost.missing.length) parts.push('Vergessen: '+ost.missing.map(o=>(o.need-haveQty(o.key))+'× '+esc(o.name)).join(', '));
+      if(ost.over.length||ost.extra.length) parts.push('Nicht auf der Liste: '+[...ost.over.map(o=>(haveQty(o.key)-o.need)+'× '+esc(o.name)),...ost.extra.map(l=>l.qty+'× '+esc(l.name))].join(', '));
+      orderMsg='<br>📝 '+parts.join(' · '); orderSpeech='Hoppla, da stimmt etwas nicht mit der Einkaufsliste. '; }
+    order=null; }
+  $('#thanks small').innerHTML='Auf Wiedersehen!'+stampMsg+orderMsg;
   $('#drawer').classList.add('open'); $('#thanks').classList.add('show');
-  if(ch>0) setTimeout(()=>say('Ihr Rückgeld: '+spokenPrice(ch)+'. Danke schön!'),500); else setTimeout(()=>say('Danke schön!'),500);
+  if(ch>0) setTimeout(()=>say(orderSpeech+'Ihr Rückgeld: '+spokenPrice(ch)+'. Danke schön!'),500); else setTimeout(()=>say(orderSpeech+'Danke schön!'),500);
   setTimeout(()=>{ $('#drawer').classList.remove('open'); $('#thanks').classList.remove('show'); newCustomer(); closing=false; paused=false; vstate='locked'; lockedFrames=0; }, 2600);
 }
 $('#payDone').onclick=()=>{ if(store.settings.change && given>due()) openChange(); else finishSale(); };
@@ -1193,6 +1267,7 @@ function openSettings(){
   seg('#segCoupons',[[1,'An'],[0,'Aus']],s.coupons?1:0,v=>s.coupons=v==='1');
   seg('#segBarcode',[[1,'An'],[0,'Aus']],s.barcode?1:0,v=>s.barcode=v==='1');
   seg('#segLookup',[[1,'An'],[0,'Aus']],s.lookup?1:0,v=>s.lookup=v==='1');
+  seg('#segLevel',[[0,'Leicht'],[1,'Mittel'],[2,'Schwer']],s.level,v=>s.level=+v);
   seg('#segChange',[[1,'An'],[0,'Aus']],s.change?1:0,v=>s.change=v==='1');
   seg('#segSpeak',[[1,'An'],[0,'Aus']],s.speak?1:0,v=>s.speak=v==='1');
   seg('#segSide',[['left','Links'],['right','Rechts']],s.camSide,v=>{ s.camSide=v; applySide(); });
@@ -1224,7 +1299,7 @@ $('#wipeBtn').onclick=()=>{ if(!store.items.length) return; if(Date.now()-wipeAr
 $('#setClose').onclick=()=>{ const n=$('#setShop').value.trim(); if(n && n!==curShop().name) store.shopNames[store.shopId]=n; else delete store.shopNames[store.shopId]; $('#shopName').textContent=shopTitle(); save(); hide('#setModal'); paused=false; setStatus(readyText()); };
 
 /* ---------- Info ---------- */
-const APP_VERSION='1.6.3';
+const APP_VERSION='1.7.0';
 
 /* ---------- Sicherung ---------- */
 function backupInfo(){ const off = ('serviceWorker' in navigator) && navigator.serviceWorker.controller;

@@ -11,7 +11,8 @@ Gegenstände oder Verpackungen über die Kamera halten – die Kasse piept, zeig
 
 - **Scannen per Kamera** – Farberkennung für Spielsachen, die man vorher einmal „lernt“
 - **Echte Barcodes** von Verpackungen – beim ersten Scan einmal benennen (Namensvorschlag über Open Food Facts), danach piept es sofort
-- **Vier Läden** – Supermarkt, Bäckerei, Spielzeugladen, Eisdiele, jeweils mit eigenen Artikeln und Farben
+- **Sechs Läden** – Supermarkt, Bäckerei, Spielzeugladen, Eisdiele, Schreibwarenladen, Tierhandlung, jeweils mit eigenen Artikeln und Farben
+- **Kunden-Modus** (📝 Kunde) – die Kasse liest eine Einkaufsliste vor, das Kind kauft ein, beim Bezahlen wird geprüft, ob alles stimmt (Leicht/Mittel/Schwer in den Einstellungen)
 - **Sonderangebote** (täglich wechselnd), **Rabattmarken** und **Gutscheine**
 - **Waage** für Obst, Gemüse und Süßes mit Kilopreis
 - **Bezahlen** mit Spielgeld-Münzen und -Scheinen (1 ct bis 100 €) oder am **Kartenterminal** mit PIN
