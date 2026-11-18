@@ -1,5 +1,5 @@
 // Kinderkasse – Offline-Speicher. Online wird immer die neueste Version geholt, offline die gespeicherte.
-const CACHE='kinderkasse-v8';
+const CACHE='kinderkasse-v9';
 const FILES=['./','index.html','zbar.js','apple-touch-icon.png','manifest.webmanifest','ZBAR-LICENSE.txt'];
 self.addEventListener('install',e=>{ self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).catch(()=>{})); });
 self.addEventListener('activate',e=>{ e.waitUntil(self.clients.claim()); });
