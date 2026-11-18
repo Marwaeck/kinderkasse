@@ -786,7 +786,7 @@ $('#lines').addEventListener('click',e=>{ const b=e.target.closest('.x'); if(!b)
 $('#stornoBtn').onclick=()=>{ if(!history.length) return; tone(700,0,.08,'square',.06); removeOne(history[history.length-1]); };
 let clearArm=0;
 $('#clearBtn').onclick=()=>{ if(!cart.length) return; if(Date.now()-clearArm>2500){ clearArm=Date.now(); toast('Nochmal tippen zum Leeren'); return; } newCustomer(); };
-function newCustomer(){ payDisc={coupon:null,heft:false}; cart=[]; history=[]; lastIdx=-1; $('#lcdItem').textContent='WILLKOMMEN!'; $('#lcdPrice').textContent=''; render(); }
+function newCustomer(){ payDisc={coupon:null,heft:false}; cart=[]; history=[]; lastIdx=-1; $('#lcdItem').textContent='WILLKOMMEN!'; $('#lcdPrice').textContent=''; render(); if(typeof updWaiting!=='undefined' && updWaiting) setTimeout(applyUpdate,1500); }
 
 let closing=false;
 function scanItem(it){
@@ -1307,7 +1307,7 @@ $('#wipeBtn').onclick=()=>{ if(!store.items.length) return; if(Date.now()-wipeAr
 $('#setClose').onclick=()=>{ const n=$('#setShop').value.trim(); if(n && n!==curShop().name) store.shopNames[store.shopId]=n; else delete store.shopNames[store.shopId]; $('#shopName').textContent=shopTitle(); save(); hide('#setModal'); paused=false; setStatus(readyText()); };
 
 /* ---------- Info ---------- */
-const APP_VERSION='1.7.1';
+const APP_VERSION='1.7.2';
 
 /* ---------- Sicherung ---------- */
 function backupInfo(){ const off = ('serviceWorker' in navigator) && navigator.serviceWorker.controller;
@@ -1338,6 +1338,31 @@ $('#importIn').addEventListener('change',async e=>{
     toast('✔ Sicherung geladen: '+added+' neu, '+updated+' aktualisiert',3500);
   }catch(err){ toast('Das ist keine Kinderkasse-Sicherung',3000); }
 });
+/* Automatisches Update: neue Version im Netz → neu laden, sobald gerade niemand einkauft */
+let updWaiting=null, updChecked=0;
+const idleForUpdate=()=> !cart.length && !order && !closing && ![...document.querySelectorAll('.modal.show')].some(m=>m.id!=='startModal');
+async function checkUpdate(){
+  if(!navigator.onLine || !/^https?:$/.test(location.protocol)) return;
+  if(!updWaiting){
+    if(Date.now()-updChecked<60000) return; updChecked=Date.now();
+    try{ const t=await (await fetch('index.html?check='+Date.now(),{cache:'no-store'})).text();
+      const m=t.match(/APP_VERSION='([^']+)'/); if(m && m[1]!==APP_VERSION) updWaiting=m[1]; }catch(e){ return; }
+  }
+  if(updWaiting) applyUpdate();
+}
+async function applyUpdate(){
+  if(!updWaiting || !idleForUpdate()) return;
+  const v=updWaiting; updWaiting=null;
+  try{ await Promise.all(['./','index.html','sw.js'].map(f=>fetch(f,{cache:'reload'}).catch(()=>{})));
+    const r='serviceWorker' in navigator && await navigator.serviceWorker.getRegistration(); if(r) await r.update().catch(()=>{}); }catch(e){}
+  try{ sessionStorage.setItem('kk.updated',v); }catch(e){}
+  location.reload();
+}
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') setTimeout(checkUpdate,1500); });
+setInterval(()=>{ if(document.visibilityState==='visible') checkUpdate(); },15*60000);
+setTimeout(checkUpdate,8000);
+try{ const v=sessionStorage.getItem('kk.updated'); if(v){ sessionStorage.removeItem('kk.updated'); setTimeout(()=>toast('🆕 Kinderkasse aktualisiert auf Version '+v,3500),600); } }catch(e){}
+
 /* Offline: App-Dateien auf dem Gerät speichern, Speicher dauerhaft anfordern */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')){ try{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){} }
 try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{}); }catch(e){}
