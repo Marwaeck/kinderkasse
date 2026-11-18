@@ -113,6 +113,10 @@
   .modal.show{display:flex}
   .sheet{background:var(--panel);border-radius:24px;padding:22px;width:min(760px,100%);max-height:100%;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);-webkit-overflow-scrolling:touch}
   .sheet h2{margin:0 0 14px;font-size:28px}
+  .verTag{font-size:15px;font-weight:700;color:var(--muted);background:#1b2130;border-radius:10px;padding:4px 10px;vertical-align:middle;margin-left:8px}
+  .updRow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .updRow .btn{flex:0 0 auto}
+  #updInfo{flex:1;min-width:180px;margin:0}
   .sheet h3{margin:18px 0 8px;font-size:17px;color:var(--muted)}
   .sheetBtns{display:flex;gap:10px;margin-top:18px}
   .sheetBtns .btn{flex:1}
@@ -410,7 +414,7 @@
 <!-- Einstellungen -->
 <div class="modal" id="setModal">
   <div class="sheet">
-    <h2>⚙️ Einstellungen</h2>
+    <h2>⚙️ Einstellungen <span class="verTag" id="setVer"></span></h2>
     <label class="lbl" for="setShop">Name dieses Ladens</label>
     <input id="setShop" class="inp" autocomplete="off">
     <div class="setRow"><span>Kamera</span><div class="seg" id="segCam"></div></div>
@@ -426,6 +430,11 @@
     <div class="setRow"><span>Preis ansagen</span><div class="seg" id="segSpeak"></div></div>
     <div class="setRow"><span>Kamera-Seite (Querformat)</span><div class="seg" id="segSide"></div></div>
     <div class="setRow"><span>Technik-Infos im Kamerabild</span><div class="seg" id="segDebug"></div></div>
+    <h3>Update</h3>
+    <div class="updRow">
+      <button class="btn blue" id="updBtn">🔄 Nach Update suchen</button>
+      <p class="hint" id="updInfo"></p>
+    </div>
     <h3>Sicherung</h3>
     <div class="sheetBtns" style="margin-top:0">
       <button class="btn blue" id="backupBtn">⬆️ Sicherung speichern</button>
@@ -1280,7 +1289,7 @@ function openSettings(){
   seg('#segSpeak',[[1,'An'],[0,'Aus']],s.speak?1:0,v=>s.speak=v==='1');
   seg('#segSide',[['left','Links'],['right','Rechts']],s.camSide,v=>{ s.camSide=v; applySide(); });
   seg('#segDebug',[[1,'An'],[0,'Aus']],s.debug?1:0,v=>{ s.debug=v==='1'; paintStatus(); });
-  paintItemList(); backupInfo(); show('#setModal');
+  paintItemList(); backupInfo(); updReset(); show('#setModal');
 }
 function paintItemList(){
   $('#itemList').innerHTML = store.items.length ? store.items.map(it=>`<div class="itemRow" data-id="${it.id}">
@@ -1307,7 +1316,8 @@ $('#wipeBtn').onclick=()=>{ if(!store.items.length) return; if(Date.now()-wipeAr
 $('#setClose').onclick=()=>{ const n=$('#setShop').value.trim(); if(n && n!==curShop().name) store.shopNames[store.shopId]=n; else delete store.shopNames[store.shopId]; $('#shopName').textContent=shopTitle(); save(); hide('#setModal'); paused=false; setStatus(readyText()); };
 
 /* ---------- Info ---------- */
-const APP_VERSION='1.7.2';
+const APP_VERSION='1.7.3';
+$('#appVer').textContent=APP_VERSION; $('#setVer').textContent='Version '+APP_VERSION;
 
 /* ---------- Sicherung ---------- */
 function backupInfo(){ const off = ('serviceWorker' in navigator) && navigator.serviceWorker.controller;
@@ -1350,8 +1360,8 @@ async function checkUpdate(){
   }
   if(updWaiting) applyUpdate();
 }
-async function applyUpdate(){
-  if(!updWaiting || !idleForUpdate()) return;
+async function applyUpdate(force){
+  if(!updWaiting || (!force && !idleForUpdate())) return;
   const v=updWaiting; updWaiting=null;
   try{ await Promise.all(['./','index.html','sw.js'].map(f=>fetch(f,{cache:'reload'}).catch(()=>{})));
     const r='serviceWorker' in navigator && await navigator.serviceWorker.getRegistration(); if(r) await r.update().catch(()=>{}); }catch(e){}
@@ -1362,6 +1372,31 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 setInterval(()=>{ if(document.visibilityState==='visible') checkUpdate(); },15*60000);
 setTimeout(checkUpdate,8000);
 try{ const v=sessionStorage.getItem('kk.updated'); if(v){ sessionStorage.removeItem('kk.updated'); setTimeout(()=>toast('🆕 Kinderkasse aktualisiert auf Version '+v,3500),600); } }catch(e){}
+
+/* Manueller Update-Knopf (Einstellungen) */
+let updState='idle', updArm=0;
+function updPaint(btn,info){ $('#updBtn').textContent=btn; $('#updInfo').textContent=info; }
+function updReset(){ updState='idle'; updPaint('🔄 Nach Update suchen','Installiert: Version '+APP_VERSION+'. Updates kommen sonst automatisch, wenn gerade niemand einkauft.'); }
+$('#updBtn').onclick=async ()=>{
+  if(updState==='busy') return;
+  if(updState==='ready'){
+    if(cart.length && Date.now()-updArm>3000){ updArm=Date.now(); toast('Im Warenkorb liegt noch etwas – nochmal tippen, dann wird er geleert.',3500); return; }
+    updState='busy'; updPaint('⏳ Wird geladen …','Die neue Version wird geladen, die App startet gleich neu.');
+    if(!updWaiting) updWaiting=updNext||APP_VERSION;
+    applyUpdate(true); return;
+  }
+  if(!/^https?:$/.test(location.protocol)){ updPaint('🔄 Nach Update suchen','Updates gibt es nur in der Online-Version (marwaeck.github.io/kinderkasse).'); return; }
+  if(!navigator.onLine){ updPaint('🔄 Nach Update suchen','Keine Internetverbindung – bitte später nochmal versuchen.'); return; }
+  updState='busy'; updPaint('⏳ Suche …','Frage die neueste Version ab …');
+  try{ const t=await (await fetch('index.html?check='+Date.now(),{cache:'no-store'})).text();
+    const m=t.match(/APP_VERSION='([^']+)'/); updChecked=Date.now();
+    if(!m) throw new Error('keine Version');
+    updNext=m[1];
+    if(m[1]!==APP_VERSION){ updState='ready'; updPaint('⬇️ Jetzt aktualisieren','Neue Version '+m[1]+' ist da (installiert: '+APP_VERSION+').'); tone(1320,0,.1,'triangle',.18); }
+    else { updState='ready'; updPaint('↻ Trotzdem neu laden','✔ Du hast die neueste Version ('+APP_VERSION+').'); }
+  }catch(e){ updState='idle'; updPaint('🔄 Nach Update suchen','Abfrage hat nicht geklappt – bitte später nochmal versuchen.'); }
+};
+let updNext=null;
 
 /* Offline: App-Dateien auf dem Gerät speichern, Speicher dauerhaft anfordern */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')){ try{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){} }
