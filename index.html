@@ -675,7 +675,14 @@ const SHOPS={
     {name:'Vogelfutter',emoji:'🌻',price:229},{name:'Fischfutter',emoji:'🦐',price:399},{name:'Heu',emoji:'🌾',price:299},{name:'Katzenstreu',emoji:'🪣',price:599},
     {name:'Futternapf',emoji:'🥣',price:499},{name:'Hundeleine',emoji:'🦮',price:1299},{name:'Tennisball',emoji:'🎾',price:149},{name:'Wollknäuel',emoji:'🧶',price:199},
     {name:'Spielmaus',emoji:'🐭',price:249},{name:'Goldfisch',emoji:'🐠',price:350},{name:'Hamster',emoji:'🐹',price:1299},{name:'Wellensittich',emoji:'🦜',price:2499},
-    {name:'Kaninchen',emoji:'🐰',price:2999},{name:'Schildkröte',emoji:'🐢',price:3999}]}
+    {name:'Kaninchen',emoji:'🐰',price:2999},{name:'Schildkröte',emoji:'🐢',price:3999}]},
+  drogerie:{name:'Drogerie',emoji:'🧴',c:['#14213d','#1d2f55','#27406f','#ffd400'],cat:[
+    {name:'Zahnpasta',emoji:'🦷',price:65},{name:'Zahnbürste',emoji:'🪥',price:125},{name:'Shampoo',emoji:'🧴',price:95},{name:'Duschgel',emoji:'🚿',price:75},
+    {name:'Seife',emoji:'🧼',price:55},{name:'Schaumbad',emoji:'🛁',price:145},{name:'Handcreme',emoji:'🤲',price:125},{name:'Sonnencreme',emoji:'🌞',price:495},
+    {name:'Lippenpflege',emoji:'💋',price:95},{name:'Lippenstift',emoji:'💄',price:295},{name:'Nagellack',emoji:'💅',price:195},{name:'Haargummis',emoji:'🎀',price:125},
+    {name:'Kamm',emoji:'🪮',price:145},{name:'Windeln',emoji:'👶',price:695},{name:'Babybrei',emoji:'🥣',price:95},{name:'Taschentücher',emoji:'🤧',price:95},
+    {name:'Klopapier',emoji:'🧻',price:325},{name:'Pflaster',emoji:'🩹',price:145},{name:'Waschmittel',emoji:'🫧',price:395},{name:'Spülmittel',emoji:'🍽️',price:85},
+    {name:'Schwamm',emoji:'🧽',price:65},{name:'Kräutertee',emoji:'🍵',price:145}]}
 };
 if(!SHOPS[store.shopId]) store.shopId='supermarkt';
 const curShop=()=>SHOPS[store.shopId];
@@ -1316,7 +1323,7 @@ $('#wipeBtn').onclick=()=>{ if(!store.items.length) return; if(Date.now()-wipeAr
 $('#setClose').onclick=()=>{ const n=$('#setShop').value.trim(); if(n && n!==curShop().name) store.shopNames[store.shopId]=n; else delete store.shopNames[store.shopId]; $('#shopName').textContent=shopTitle(); save(); hide('#setModal'); paused=false; setStatus(readyText()); };
 
 /* ---------- Info ---------- */
-const APP_VERSION='1.7.3';
+const APP_VERSION='1.7.4';
 $('#appVer').textContent=APP_VERSION; $('#setVer').textContent='Version '+APP_VERSION;
 
 /* ---------- Sicherung ---------- */
